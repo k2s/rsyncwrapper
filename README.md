@@ -208,3 +208,36 @@ rsync(
   }
 )
 ```
+
+Simple to use as promise too:
+
+```javascript
+const rsyncwrapper = require('rsyncwrapper')
+const util = require('util')
+
+// promisify rsync
+rsyncwrapper[util.promisify.custom] = (options) => {
+  return new Promise((resolve, reject) => {
+    rsyncwrapper(options, (error, stdout, stderr, cmd) => {
+      if (error) {
+        reject(error)
+      } else {
+        resolve({ stdout, stderr, cmd })
+      }
+    })
+  })
+}
+const rsync = util.promisify(rsyncwrapper)
+
+try {
+  await rsync({
+    src: 'local-src/',
+    dest: 'user@1.2.3.4:/var/www/remote-dest',
+    ssh: true,
+    recursive: true,
+    deleteAll: true, // Careful, this could cause data loss
+  })
+catch (ex) {
+  console.error(ex
+}
+```
